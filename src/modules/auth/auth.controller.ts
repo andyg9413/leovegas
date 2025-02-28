@@ -14,15 +14,20 @@ import {
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { AuthResponseDto } from './dto/auth-response.dto';
 import { User } from '../users/entities/user.entity';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { TokenValidationGuard } from './guards/token-validation.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
+import { UserMapper } from '../users/mappers/user.mapper';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userMapper: UserMapper,
+  ) {}
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -30,9 +35,14 @@ export class AuthController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'User logged in successfully',
+    type: AuthResponseDto,
   })
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
+    const { access_token, user } = await this.authService.login(loginDto);
+    return {
+      access_token,
+      user: this.userMapper.toResponseDto(user),
+    };
   }
 
   @Post('logout')
