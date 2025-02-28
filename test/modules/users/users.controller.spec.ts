@@ -3,7 +3,10 @@ import { ForbiddenException } from '@nestjs/common';
 import { UsersController } from '../../../src/modules/users/users.controller';
 import { UsersService } from '../../../src/modules/users/users.service';
 import { UserMapper } from '../../../src/modules/users/mappers/user.mapper';
-import { User, UserRole } from '../../../src/modules/users/entities/user.entity';
+import {
+  User,
+  UserRole,
+} from '../../../src/modules/users/entities/user.entity';
 import { CreateUserDto } from '../../../src/modules/users/dto/create-user.dto';
 import { UpdateUserDto } from '../../../src/modules/users/dto/update-user.dto';
 import { UsersQueryDto } from '../../../src/modules/users/dto/users-query.dto';
@@ -120,9 +123,10 @@ describe('UsersController', () => {
         data: mappedUsers,
       });
       expect(mockUsersService.findAllPaginated).toHaveBeenCalledWith(query);
-      expect(mockUserMapper.toResponseDtoArray).toHaveBeenCalledWith(mockPaginatedResult.data);
+      expect(mockUserMapper.toResponseDtoArray).toHaveBeenCalledWith(
+        mockPaginatedResult.data,
+      );
     });
-
 
     it('should apply all filters correctly', async () => {
       const query = {
@@ -186,7 +190,9 @@ describe('UsersController', () => {
     it('should throw ForbiddenException when non-admin requests other user details', async () => {
       const otherUserId = '3';
 
-      await expect(controller.findOne(otherUserId, mockUser)).rejects.toThrow(ForbiddenException);
+      await expect(controller.findOne(otherUserId, mockUser)).rejects.toThrow(
+        ForbiddenException,
+      );
       expect(mockUsersService.findOne).not.toHaveBeenCalled();
     });
   });
@@ -204,10 +210,17 @@ describe('UsersController', () => {
       mockUsersService.update.mockResolvedValue(updatedUser);
       mockUserMapper.toResponseDto.mockReturnValue(mappedUser);
 
-      const result = await controller.update(mockUser.id, updateUserDto, mockAdminUser);
+      const result = await controller.update(
+        mockUser.id,
+        updateUserDto,
+        mockAdminUser,
+      );
 
       expect(result).toEqual(mappedUser);
-      expect(mockUsersService.update).toHaveBeenCalledWith(mockUser.id, updateUserDto);
+      expect(mockUsersService.update).toHaveBeenCalledWith(
+        mockUser.id,
+        updateUserDto,
+      );
     });
 
     it('should update own user details', async () => {
@@ -218,7 +231,11 @@ describe('UsersController', () => {
       mockUsersService.update.mockResolvedValue(updatedUser);
       mockUserMapper.toResponseDto.mockReturnValue(mappedUser);
 
-      const result = await controller.update(mockUser.id, updateUserDto, mockUser);
+      const result = await controller.update(
+        mockUser.id,
+        updateUserDto,
+        mockUser,
+      );
 
       expect(result).toEqual(mappedUser);
     });
@@ -227,7 +244,7 @@ describe('UsersController', () => {
       const otherUserId = '3';
 
       await expect(
-        controller.update(otherUserId, updateUserDto, mockUser)
+        controller.update(otherUserId, updateUserDto, mockUser),
       ).rejects.toThrow(ForbiddenException);
       expect(mockUsersService.update).not.toHaveBeenCalled();
     });
@@ -236,7 +253,7 @@ describe('UsersController', () => {
       const updateWithRole = { ...updateUserDto, role: UserRole.ADMIN };
 
       await expect(
-        controller.update(mockUser.id, updateWithRole, mockUser)
+        controller.update(mockUser.id, updateWithRole, mockUser),
       ).rejects.toThrow(ForbiddenException);
       expect(mockUsersService.update).not.toHaveBeenCalled();
     });
@@ -247,7 +264,7 @@ describe('UsersController', () => {
       mockUsersService.findOne.mockResolvedValue(mockAdminUser);
 
       await expect(
-        controller.update(mockAdminUser.id, updateWithRole, mockAdminUser)
+        controller.update(mockAdminUser.id, updateWithRole, mockAdminUser),
       ).rejects.toThrow(ForbiddenException);
       expect(mockUsersService.update).not.toHaveBeenCalled();
     });
@@ -261,10 +278,17 @@ describe('UsersController', () => {
       mockUsersService.update.mockResolvedValue(updatedUser);
       mockUserMapper.toResponseDto.mockReturnValue(mappedUser);
 
-      const result = await controller.update(mockUser.id, partialUpdate, mockUser);
+      const result = await controller.update(
+        mockUser.id,
+        partialUpdate,
+        mockUser,
+      );
 
       expect(result).toEqual(mappedUser);
-      expect(mockUsersService.update).toHaveBeenCalledWith(mockUser.id, partialUpdate);
+      expect(mockUsersService.update).toHaveBeenCalledWith(
+        mockUser.id,
+        partialUpdate,
+      );
     });
 
     it('should handle password updates', async () => {
@@ -276,10 +300,17 @@ describe('UsersController', () => {
       mockUsersService.update.mockResolvedValue(updatedUser);
       mockUserMapper.toResponseDto.mockReturnValue(mappedUser);
 
-      const result = await controller.update(mockUser.id, updateWithPassword, mockUser);
+      const result = await controller.update(
+        mockUser.id,
+        updateWithPassword,
+        mockUser,
+      );
 
       expect(result).toEqual(mappedUser);
-      expect(mockUsersService.update).toHaveBeenCalledWith(mockUser.id, updateWithPassword);
+      expect(mockUsersService.update).toHaveBeenCalledWith(
+        mockUser.id,
+        updateWithPassword,
+      );
     });
 
     it('should allow admin to update user role', async () => {
@@ -291,10 +322,17 @@ describe('UsersController', () => {
       mockUsersService.update.mockResolvedValue(updatedUser);
       mockUserMapper.toResponseDto.mockReturnValue(mappedUser);
 
-      const result = await controller.update(mockUser.id, updateWithRole, mockAdminUser);
+      const result = await controller.update(
+        mockUser.id,
+        updateWithRole,
+        mockAdminUser,
+      );
 
       expect(result).toEqual(mappedUser);
-      expect(mockUsersService.update).toHaveBeenCalledWith(mockUser.id, updateWithRole);
+      expect(mockUsersService.update).toHaveBeenCalledWith(
+        mockUser.id,
+        updateWithRole,
+      );
     });
   });
 
@@ -310,7 +348,7 @@ describe('UsersController', () => {
 
     it('should throw ForbiddenException when trying to delete own account', async () => {
       await expect(
-        controller.remove(mockAdminUser.id, mockAdminUser)
+        controller.remove(mockAdminUser.id, mockAdminUser),
       ).rejects.toThrow(ForbiddenException);
       expect(mockUsersService.remove).not.toHaveBeenCalled();
     });
@@ -319,7 +357,7 @@ describe('UsersController', () => {
       mockUsersService.findOne.mockResolvedValue(mockAdminUser);
 
       await expect(
-        controller.remove(mockAdminUser.id, mockAdminUser)
+        controller.remove(mockAdminUser.id, mockAdminUser),
       ).rejects.toThrow(ForbiddenException);
       expect(mockUsersService.remove).not.toHaveBeenCalled();
     });
@@ -328,7 +366,7 @@ describe('UsersController', () => {
       mockUsersService.findOne.mockResolvedValue(null);
 
       await expect(
-        controller.remove('nonexistent-id', mockAdminUser)
+        controller.remove('nonexistent-id', mockAdminUser),
       ).rejects.toThrow();
       expect(mockUsersService.remove).not.toHaveBeenCalled();
     });
@@ -338,8 +376,8 @@ describe('UsersController', () => {
       mockUsersService.remove.mockRejectedValue(new Error('Database error'));
 
       await expect(
-        controller.remove(mockUser.id, mockAdminUser)
+        controller.remove(mockUser.id, mockAdminUser),
       ).rejects.toThrow();
     });
   });
-}); 
+});

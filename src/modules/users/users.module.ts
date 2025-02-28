@@ -11,4 +11,4 @@ import { UserMapper } from './mappers/user.mapper';
   providers: [UsersService, UserMapper],
   exports: [UsersService, UserMapper],
 })
-export class UsersModule {} 
+export class UsersModule {}

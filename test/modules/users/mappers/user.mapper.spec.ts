@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UserMapper } from '../../../../src/modules/users/mappers/user.mapper';
-import { User, UserRole } from '../../../../src/modules/users/entities/user.entity';
+import {
+  User,
+  UserRole,
+} from '../../../../src/modules/users/entities/user.entity';
 
 describe('UserMapper', () => {
   let mapper: UserMapper;
@@ -133,8 +136,8 @@ describe('UserMapper', () => {
 
       const result = mapper.toResponseDtoArray(mockUsers);
 
-      expect(result.map(user => user.id)).toEqual(['1', '2', '3']);
-      expect(result.map(user => user.email)).toEqual([
+      expect(result.map((user) => user.id)).toEqual(['1', '2', '3']);
+      expect(result.map((user) => user.email)).toEqual([
         'user1@example.com',
         'user2@example.com',
         'user3@example.com',
@@ -147,4 +150,4 @@ describe('UserMapper', () => {
       expect(() => mapper.toResponseDtoArray(mockUsers as User[])).toThrow();
     });
   });
-}); 
+});

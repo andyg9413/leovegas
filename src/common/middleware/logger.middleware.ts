@@ -14,12 +14,18 @@ export class LoggerMiddleware implements NestMiddleware {
 
   private getMethodColor(method: string): string {
     switch (method.toUpperCase()) {
-      case 'GET': return '\x1b[32m'; // Green
-      case 'POST': return '\x1b[34m'; // Blue
-      case 'PUT': return '\x1b[33m'; // Yellow
-      case 'DELETE': return '\x1b[31m'; // Red
-      case 'PATCH': return '\x1b[35m'; // Magenta
-      default: return '\x1b[0m'; // Default
+      case 'GET':
+        return '\x1b[32m'; // Green
+      case 'POST':
+        return '\x1b[34m'; // Blue
+      case 'PUT':
+        return '\x1b[33m'; // Yellow
+      case 'DELETE':
+        return '\x1b[31m'; // Red
+      case 'PATCH':
+        return '\x1b[35m'; // Magenta
+      default:
+        return '\x1b[0m'; // Default
     }
   }
 
@@ -34,7 +40,7 @@ export class LoggerMiddleware implements NestMiddleware {
     const requestId = uuidv4();
     const startTime = Date.now();
     const reset = '\x1b[0m';
-    
+
     // Add requestId to the request object for tracking
     (req as any).requestId = requestId;
 
@@ -42,22 +48,25 @@ export class LoggerMiddleware implements NestMiddleware {
     const methodColor = this.getMethodColor(req.method);
     console.log(`\n[${new Date().toISOString()}] 🔍 Request ${requestId}`);
     console.log(`${methodColor}${req.method}${reset} ${req.originalUrl}`);
-    
+
     // Log headers excluding authorization
     const headers = { ...req.headers };
     if (headers.authorization) {
       headers.authorization = headers.authorization.substring(0, 20) + '...';
     }
     console.log('Headers:', JSON.stringify(headers, null, 2));
-    
+
     // Log query parameters if present
     if (Object.keys(req.query).length > 0) {
       console.log('Query:', JSON.stringify(req.query, null, 2));
     }
-    
+
     // Log sanitized body if present
     if (Object.keys(req.body || {}).length > 0) {
-      console.log('Body:', JSON.stringify(this.sanitizeBody(req.body), null, 2));
+      console.log(
+        'Body:',
+        JSON.stringify(this.sanitizeBody(req.body), null, 2),
+      );
     }
 
     // Add response logging
@@ -66,10 +75,10 @@ export class LoggerMiddleware implements NestMiddleware {
       const statusColor = this.getStatusColor(res.statusCode);
       console.log(`[${new Date().toISOString()}] ✨ Response ${requestId}`);
       console.log(
-        `${methodColor}${req.method}${reset} ${req.originalUrl} ${statusColor}${res.statusCode}${reset} ${duration}ms\n`
+        `${methodColor}${req.method}${reset} ${req.originalUrl} ${statusColor}${res.statusCode}${reset} ${duration}ms\n`,
       );
     });
 
     next();
   }
-} 
+}

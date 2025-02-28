@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -51,16 +55,27 @@ export class UsersService extends BaseService<User> {
     return this.usersRepository.findOne({ where: { email } });
   }
 
-  async updateAccessToken(id: string, token: string | undefined): Promise<void> {
+  async updateAccessToken(
+    id: string,
+    token: string | undefined,
+  ): Promise<void> {
     await this.usersRepository.query(
       'UPDATE users SET access_token = ? WHERE id = ?',
-      [token ?? null, id]
+      [token ?? null, id],
     );
   }
 
   async findAllPaginated(
     query: UsersQueryDto,
-  ): Promise<{ data: User[]; total: number; page: number; limit: number; totalPages: number; hasNextPage: boolean; hasPreviousPage: boolean }> {
+  ): Promise<{
+    data: User[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  }> {
     const { page = 1, limit = 10, name, email, role } = query;
     const skip = (page - 1) * limit;
 
@@ -94,4 +109,4 @@ export class UsersService extends BaseService<User> {
       hasPreviousPage: page > 1,
     };
   }
-} 
+}

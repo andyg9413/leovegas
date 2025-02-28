@@ -2,7 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from '../../../src/modules/auth/auth.controller';
 import { AuthService } from '../../../src/modules/auth/auth.service';
 import { UserMapper } from '../../../src/modules/users/mappers/user.mapper';
-import { User, UserRole } from '../../../src/modules/users/entities/user.entity';
+import {
+  User,
+  UserRole,
+} from '../../../src/modules/users/entities/user.entity';
 import { LoginDto } from '../../../src/modules/auth/dto/login.dto';
 import { UserResponseDto } from '../../../src/modules/users/dto/user-response.dto';
 import { UsersService } from '../../../src/modules/users/users.service';
@@ -124,14 +127,18 @@ describe('AuthController', () => {
         throw new BadRequestException('Validation failed');
       });
 
-      await expect(controller.login(invalidLoginDto as LoginDto)).rejects.toThrow(BadRequestException);
+      await expect(
+        controller.login(invalidLoginDto as LoginDto),
+      ).rejects.toThrow(BadRequestException);
       expect(authService.login).toHaveBeenCalledWith(invalidLoginDto);
     });
 
     it('should handle authentication errors', async () => {
       authService.login.mockRejectedValue(new Error('Authentication failed'));
 
-      await expect(controller.login(loginDto)).rejects.toThrow('Authentication failed');
+      await expect(controller.login(loginDto)).rejects.toThrow(
+        'Authentication failed',
+      );
       expect(userMapper.toResponseDto).not.toHaveBeenCalled();
     });
 
@@ -160,7 +167,9 @@ describe('AuthController', () => {
     it('should handle errors during logout', async () => {
       authService.logout.mockRejectedValue(new Error('Logout failed'));
 
-      await expect(controller.logout(mockUser)).rejects.toThrow('Logout failed');
+      await expect(controller.logout(mockUser)).rejects.toThrow(
+        'Logout failed',
+      );
     });
   });
-}); 
+});

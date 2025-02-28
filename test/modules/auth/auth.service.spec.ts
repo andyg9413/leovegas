@@ -4,7 +4,10 @@ import { UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from '../../../src/modules/auth/auth.service';
 import { UsersService } from '../../../src/modules/users/users.service';
-import { User, UserRole } from '../../../src/modules/users/entities/user.entity';
+import {
+  User,
+  UserRole,
+} from '../../../src/modules/users/entities/user.entity';
 
 jest.mock('bcrypt');
 
@@ -65,18 +68,24 @@ describe('AuthService', () => {
       usersService.findByEmail.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
-      const result = await service.validateUser('test@example.com', 'password123');
+      const result = await service.validateUser(
+        'test@example.com',
+        'password123',
+      );
 
       expect(result).toEqual(mockUser);
       expect(usersService.findByEmail).toHaveBeenCalledWith('test@example.com');
-      expect(bcrypt.compare).toHaveBeenCalledWith('password123', mockUser.password);
+      expect(bcrypt.compare).toHaveBeenCalledWith(
+        'password123',
+        mockUser.password,
+      );
     });
 
     it('should throw UnauthorizedException when user not found', async () => {
       usersService.findByEmail.mockResolvedValue(null);
 
       await expect(
-        service.validateUser('nonexistent@example.com', 'password123')
+        service.validateUser('nonexistent@example.com', 'password123'),
       ).rejects.toThrow(UnauthorizedException);
       expect(bcrypt.compare).not.toHaveBeenCalled();
     });
@@ -86,17 +95,22 @@ describe('AuthService', () => {
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       await expect(
-        service.validateUser('test@example.com', 'wrongpassword')
+        service.validateUser('test@example.com', 'wrongpassword'),
       ).rejects.toThrow(UnauthorizedException);
-      expect(bcrypt.compare).toHaveBeenCalledWith('wrongpassword', mockUser.password);
+      expect(bcrypt.compare).toHaveBeenCalledWith(
+        'wrongpassword',
+        mockUser.password,
+      );
     });
 
     it('should handle bcrypt errors', async () => {
       usersService.findByEmail.mockResolvedValue(mockUser);
-      (bcrypt.compare as jest.Mock).mockRejectedValue(new Error('Bcrypt error'));
+      (bcrypt.compare as jest.Mock).mockRejectedValue(
+        new Error('Bcrypt error'),
+      );
 
       await expect(
-        service.validateUser('test@example.com', 'password123')
+        service.validateUser('test@example.com', 'password123'),
       ).rejects.toThrow('Bcrypt error');
     });
   });
@@ -109,7 +123,7 @@ describe('AuthService', () => {
 
     it('should login user successfully', async () => {
       const updatedUser = { ...mockUser, access_token: mockJwtToken };
-      
+
       usersService.findByEmail.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
       jwtService.sign.mockReturnValue(mockJwtToken);
@@ -125,7 +139,10 @@ describe('AuthService', () => {
         sub: mockUser.id,
         email: mockUser.email,
       });
-      expect(usersService.updateAccessToken).toHaveBeenCalledWith(mockUser.id, mockJwtToken);
+      expect(usersService.updateAccessToken).toHaveBeenCalledWith(
+        mockUser.id,
+        mockJwtToken,
+      );
       expect(usersService.findOne).toHaveBeenCalledWith(mockUser.id);
     });
 
@@ -133,7 +150,9 @@ describe('AuthService', () => {
       usersService.findByEmail.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException);
+      await expect(service.login(loginDto)).rejects.toThrow(
+        UnauthorizedException,
+      );
       expect(jwtService.sign).not.toHaveBeenCalled();
       expect(usersService.updateAccessToken).not.toHaveBeenCalled();
     });
@@ -142,7 +161,9 @@ describe('AuthService', () => {
       usersService.findByEmail.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
       jwtService.sign.mockReturnValue(mockJwtToken);
-      usersService.updateAccessToken.mockRejectedValue(new Error('Update failed'));
+      usersService.updateAccessToken.mockRejectedValue(
+        new Error('Update failed'),
+      );
 
       await expect(service.login(loginDto)).rejects.toThrow('Update failed');
       expect(jwtService.sign).toHaveBeenCalled();
@@ -164,13 +185,20 @@ describe('AuthService', () => {
     it('should logout user successfully', async () => {
       await service.logout(mockUser.id);
 
-      expect(usersService.updateAccessToken).toHaveBeenCalledWith(mockUser.id, undefined);
+      expect(usersService.updateAccessToken).toHaveBeenCalledWith(
+        mockUser.id,
+        undefined,
+      );
     });
 
     it('should handle errors during logout', async () => {
-      usersService.updateAccessToken.mockRejectedValue(new Error('Logout failed'));
+      usersService.updateAccessToken.mockRejectedValue(
+        new Error('Logout failed'),
+      );
 
-      await expect(service.logout(mockUser.id)).rejects.toThrow('Logout failed');
+      await expect(service.logout(mockUser.id)).rejects.toThrow(
+        'Logout failed',
+      );
     });
   });
-}); 
+});

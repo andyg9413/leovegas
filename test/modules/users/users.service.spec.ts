@@ -4,7 +4,10 @@ import { Repository } from 'typeorm';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../../../src/modules/users/users.service';
-import { User, UserRole } from '../../../src/modules/users/entities/user.entity';
+import {
+  User,
+  UserRole,
+} from '../../../src/modules/users/entities/user.entity';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -62,23 +65,45 @@ describe('UsersService', () => {
       const hashedPassword = 'hashedPassword';
       jest.spyOn(bcrypt, 'hash').mockResolvedValue(hashedPassword as never);
       mockRepository.findOne.mockResolvedValue(null);
-      mockRepository.create.mockReturnValue({ ...createUserDto, password: hashedPassword });
-      mockRepository.save.mockResolvedValue({ id: '1', ...createUserDto, password: hashedPassword });
+      mockRepository.create.mockReturnValue({
+        ...createUserDto,
+        password: hashedPassword,
+      });
+      mockRepository.save.mockResolvedValue({
+        id: '1',
+        ...createUserDto,
+        password: hashedPassword,
+      });
 
       const result = await service.create(createUserDto);
 
-      expect(result).toEqual(expect.objectContaining({ id: '1', ...createUserDto, password: "hashedPassword" }));
-      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { email: createUserDto.email } });
+      expect(result).toEqual(
+        expect.objectContaining({
+          id: '1',
+          ...createUserDto,
+          password: 'hashedPassword',
+        }),
+      );
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { email: createUserDto.email },
+      });
       expect(bcrypt.hash).toHaveBeenCalledWith(createUserDto.password, 10);
-      expect(mockRepository.create).toHaveBeenCalledWith({ ...createUserDto, password: hashedPassword });
+      expect(mockRepository.create).toHaveBeenCalledWith({
+        ...createUserDto,
+        password: hashedPassword,
+      });
       expect(mockRepository.save).toHaveBeenCalled();
     });
 
     it('should throw ConflictException if email already exists', async () => {
       mockRepository.findOne.mockResolvedValue({ id: '1', ...createUserDto });
 
-      await expect(service.create(createUserDto)).rejects.toThrow(ConflictException);
-      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { email: createUserDto.email } });
+      await expect(service.create(createUserDto)).rejects.toThrow(
+        ConflictException,
+      );
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { email: createUserDto.email },
+      });
       expect(mockRepository.create).not.toHaveBeenCalled();
       expect(mockRepository.save).not.toHaveBeenCalled();
     });
@@ -86,8 +111,18 @@ describe('UsersService', () => {
 
   describe('findAllPaginated', () => {
     const mockUsers = [
-      { id: '1', name: 'User 1', email: 'user1@example.com', role: UserRole.USER },
-      { id: '2', name: 'User 2', email: 'user2@example.com', role: UserRole.ADMIN },
+      {
+        id: '1',
+        name: 'User 1',
+        email: 'user1@example.com',
+        role: UserRole.USER,
+      },
+      {
+        id: '2',
+        name: 'User 2',
+        email: 'user2@example.com',
+        role: UserRole.ADMIN,
+      },
     ];
 
     it('should return paginated users without filters', async () => {
@@ -155,14 +190,19 @@ describe('UsersService', () => {
     });
 
     it('should calculate pagination values correctly for multiple pages', async () => {
-      const mockManyUsers = Array(15).fill(null).map((_, i) => ({
-        id: String(i + 1),
-        name: `User ${i + 1}`,
-        email: `user${i + 1}@example.com`,
-        role: UserRole.USER,
-      }));
+      const mockManyUsers = Array(15)
+        .fill(null)
+        .map((_, i) => ({
+          id: String(i + 1),
+          name: `User ${i + 1}`,
+          email: `user${i + 1}@example.com`,
+          role: UserRole.USER,
+        }));
 
-      mockRepository.findAndCount.mockResolvedValue([mockManyUsers.slice(0, 10), 15]);
+      mockRepository.findAndCount.mockResolvedValue([
+        mockManyUsers.slice(0, 10),
+        15,
+      ]);
 
       const result = await service.findAllPaginated({ page: 1, limit: 10 });
 
@@ -178,14 +218,19 @@ describe('UsersService', () => {
     });
 
     it('should handle last page correctly', async () => {
-      const mockManyUsers = Array(15).fill(null).map((_, i) => ({
-        id: String(i + 1),
-        name: `User ${i + 1}`,
-        email: `user${i + 1}@example.com`,
-        role: UserRole.USER,
-      }));
+      const mockManyUsers = Array(15)
+        .fill(null)
+        .map((_, i) => ({
+          id: String(i + 1),
+          name: `User ${i + 1}`,
+          email: `user${i + 1}@example.com`,
+          role: UserRole.USER,
+        }));
 
-      mockRepository.findAndCount.mockResolvedValue([mockManyUsers.slice(10), 15]);
+      mockRepository.findAndCount.mockResolvedValue([
+        mockManyUsers.slice(10),
+        15,
+      ]);
 
       const result = await service.findAllPaginated({ page: 2, limit: 10 });
 
@@ -221,7 +266,7 @@ describe('UsersService', () => {
         created_at: mockUser.created_at,
         updated_at: mockUser.updated_at,
       };
-      
+
       jest.spyOn(bcrypt, 'hash').mockResolvedValue(hashedPassword as never);
       mockRepository.findOne
         .mockResolvedValueOnce({ ...mockUser })
@@ -262,7 +307,9 @@ describe('UsersService', () => {
     it('should throw NotFoundException when user to update is not found', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.update('999', { name: 'New Name' })).rejects.toThrow(NotFoundException);
+      await expect(service.update('999', { name: 'New Name' })).rejects.toThrow(
+        NotFoundException,
+      );
       expect(mockRepository.update).not.toHaveBeenCalled();
     });
   });
@@ -276,7 +323,7 @@ describe('UsersService', () => {
 
       expect(mockRepository.query).toHaveBeenCalledWith(
         'UPDATE users SET access_token = ? WHERE id = ?',
-        [token, userId]
+        [token, userId],
       );
     });
 
@@ -287,7 +334,7 @@ describe('UsersService', () => {
 
       expect(mockRepository.query).toHaveBeenCalledWith(
         'UPDATE users SET access_token = ? WHERE id = ?',
-        [null, userId]
+        [null, userId],
       );
     });
   });
@@ -320,7 +367,9 @@ describe('UsersService', () => {
       const result = await service.findOne('1');
 
       expect(result).toEqual(mockUser);
-      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: '1' } });
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: '1' },
+      });
     });
 
     it('should throw NotFoundException when user not found', async () => {
@@ -337,7 +386,9 @@ describe('UsersService', () => {
 
       await service.remove('1');
 
-      expect(mockRepository.findOne).toHaveBeenCalledWith({ where: { id: '1' } });
+      expect(mockRepository.findOne).toHaveBeenCalledWith({
+        where: { id: '1' },
+      });
       expect(mockRepository.delete).toHaveBeenCalledWith('1');
     });
 
@@ -348,4 +399,4 @@ describe('UsersService', () => {
       expect(mockRepository.delete).not.toHaveBeenCalled();
     });
   });
-}); 
+});

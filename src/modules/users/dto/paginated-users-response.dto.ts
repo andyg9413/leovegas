@@ -2,7 +2,10 @@ import { ApiProperty } from '@nestjs/swagger';
 import { UserResponseDto } from './user-response.dto';
 
 export class PaginatedUsersResponseDto {
-  @ApiProperty({ description: 'Array of users for the current page', type: [UserResponseDto] })
+  @ApiProperty({
+    description: 'Array of users for the current page',
+    type: [UserResponseDto],
+  })
   data: UserResponseDto[];
 
   @ApiProperty({ description: 'Total number of users' })
@@ -22,4 +25,4 @@ export class PaginatedUsersResponseDto {
 
   @ApiProperty({ description: 'Whether there is a previous page' })
   hasPreviousPage: boolean;
-} 
+}

@@ -16,6 +16,6 @@ export class UserMapper {
   }
 
   toResponseDtoArray(users: User[]): UserResponseDto[] {
-    return users.map(user => this.toResponseDto(user));
+    return users.map((user) => this.toResponseDto(user));
   }
-} 
+}

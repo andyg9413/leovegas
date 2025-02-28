@@ -19,4 +19,4 @@ export class UserResponseDto {
 
   @ApiProperty({ description: 'When the user was last updated' })
   updated_at: Date;
-} 
+}

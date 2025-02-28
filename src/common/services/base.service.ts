@@ -27,7 +27,9 @@ export abstract class BaseService<T extends BaseEntity> {
     await this.repository.update(id, updateDto as any);
     const updated = await this.repository.findOne({ where: { id } as any });
     if (!updated) {
-      throw new NotFoundException(`Entity with ID "${id}" not found after update`);
+      throw new NotFoundException(
+        `Entity with ID "${id}" not found after update`,
+      );
     }
     return updated;
   }
@@ -36,4 +38,4 @@ export abstract class BaseService<T extends BaseEntity> {
     await this.findOne(id);
     await this.repository.delete(id);
   }
-} 
+}

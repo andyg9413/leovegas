@@ -7,7 +7,9 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
-      useFactory: async (configService: ConfigService): Promise<TypeOrmModuleOptions> => {
+      useFactory: async (
+        configService: ConfigService,
+      ): Promise<TypeOrmModuleOptions> => {
         const logger = new Logger('DatabaseModule');
         const maxRetries = 5;
         const retryDelay = 5000; // 5 seconds
@@ -47,18 +49,20 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
             return connection;
           } catch (error) {
             logger.warn(
-              `Failed to connect to database (attempt ${attempt}/${maxRetries}): ${error.message}`
+              `Failed to connect to database (attempt ${attempt}/${maxRetries}): ${error.message}`,
             );
 
             if (attempt === maxRetries) {
-              logger.error('Max retries reached. Unable to connect to database.');
+              logger.error(
+                'Max retries reached. Unable to connect to database.',
+              );
               throw error;
             }
 
             // Wait with exponential backoff before retrying
             const delay = retryDelay * Math.pow(2, attempt - 1);
             logger.log(`Waiting ${delay}ms before next attempt...`);
-            await new Promise(resolve => setTimeout(resolve, delay));
+            await new Promise((resolve) => setTimeout(resolve, delay));
           }
         }
 

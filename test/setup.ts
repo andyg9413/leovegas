@@ -19,4 +19,4 @@ jest.mock('@nestjs/jwt', () => ({
     sign: jest.fn(),
     verify: jest.fn(),
   })),
-})); 
+}));

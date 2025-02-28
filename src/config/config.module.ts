@@ -18,4 +18,4 @@ import { validationSchema } from './validation.schema';
     }),
   ],
 })
-export class ConfigModule {} 
+export class ConfigModule {}

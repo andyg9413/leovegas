@@ -1,4 +1,9 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from '../../users/users.service';
 
 @Injectable()
@@ -39,4 +44,4 @@ export class TokenValidationGuard implements CanActivate {
     request.user = dbUser;
     return true;
   }
-} 
+}

@@ -27,7 +27,11 @@ export class User extends BaseEntity {
     enum: UserRole,
     default: UserRole.USER,
   })
-  @ApiProperty({ description: 'The role of the user', enum: UserRole, default: UserRole.USER })
+  @ApiProperty({
+    description: 'The role of the user',
+    enum: UserRole,
+    default: UserRole.USER,
+  })
   role: UserRole;
 
   @Column({ nullable: true })
@@ -38,4 +42,4 @@ export class User extends BaseEntity {
     super();
     Object.assign(this, partial);
   }
-} 
+}
