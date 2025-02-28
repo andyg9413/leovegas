@@ -1,11 +1,12 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { BaseService } from '../../common/services/base.service';
+import { UsersQueryDto } from './dto/users-query.dto';
 
 @Injectable()
 export class UsersService extends BaseService<User> {
@@ -55,5 +56,42 @@ export class UsersService extends BaseService<User> {
       'UPDATE users SET access_token = ? WHERE id = ?',
       [token ?? null, id]
     );
+  }
+
+  async findAllPaginated(
+    query: UsersQueryDto,
+  ): Promise<{ data: User[]; total: number; page: number; limit: number; totalPages: number; hasNextPage: boolean; hasPreviousPage: boolean }> {
+    const { page = 1, limit = 10, name, email, role } = query;
+    const skip = (page - 1) * limit;
+
+    const whereClause: any = {};
+    if (name) {
+      whereClause.name = Like(`%${name}%`);
+    }
+    if (email) {
+      whereClause.email = Like(`%${email}%`);
+    }
+    if (role) {
+      whereClause.role = role;
+    }
+
+    const [users, total] = await this.usersRepository.findAndCount({
+      where: whereClause,
+      skip,
+      take: limit,
+      order: { created_at: 'DESC' },
+    });
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: users,
+      total,
+      page,
+      limit,
+      totalPages,
+      hasNextPage: page < totalPages,
+      hasPreviousPage: page > 1,
+    };
   }
 } 

@@ -8,8 +8,9 @@ import {
   Delete,
   UseGuards,
   ForbiddenException,
+  Query,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiExtraModels, ApiQuery } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -21,11 +22,14 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { UserMapper } from './mappers/user.mapper';
+import { UsersQueryDto } from './dto/users-query.dto';
+import { PaginatedUsersResponseDto } from './dto/paginated-users-response.dto';
 
 @ApiTags('users')
 @Controller('users')
 @UseGuards(JwtAuthGuard, TokenValidationGuard, RolesGuard)
 @ApiBearerAuth()
+@ApiExtraModels(UsersQueryDto)
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
@@ -42,12 +46,14 @@ export class UsersController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all users' })
-  @ApiResponse({ status: 200, description: 'Return all users', type: [UserResponseDto] })
+  @ApiOperation({ summary: 'Get all users with pagination and filters' })
+  @ApiResponse({ status: 200, description: 'Return paginated users', type: PaginatedUsersResponseDto })
+  @ApiExtraModels(UsersQueryDto)
   @Roles(UserRole.ADMIN)
-  async findAll(): Promise<UserResponseDto[]> {
-    const users = await this.usersService.findAll();
-    return this.userMapper.toResponseDtoArray(users);
+  async findAll(@Query() query: UsersQueryDto): Promise<PaginatedUsersResponseDto> {
+    const paginatedResult = await this.usersService.findAllPaginated(query);
+    const mappedUsers = this.userMapper.toResponseDtoArray(paginatedResult.data);
+    return { ...paginatedResult, data: mappedUsers };
   }
 
   @Get(':id')
