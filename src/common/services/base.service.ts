@@ -23,13 +23,17 @@ export abstract class BaseService<T extends BaseEntity> {
   }
 
   async update(id: string, updateDto: DeepPartial<T>): Promise<T> {
-    const entity = await this.findOne(id);
-    Object.assign(entity, updateDto);
-    return this.repository.save(entity);
+    await this.findOne(id);
+    await this.repository.update(id, updateDto as any);
+    const updated = await this.repository.findOne({ where: { id } as any });
+    if (!updated) {
+      throw new NotFoundException(`Entity with ID "${id}" not found after update`);
+    }
+    return updated;
   }
 
   async remove(id: string): Promise<void> {
-    const entity = await this.findOne(id);
-    await this.repository.remove(entity);
+    await this.findOne(id);
+    await this.repository.delete(id);
   }
 } 
