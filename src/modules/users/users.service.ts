@@ -1,5 +1,4 @@
 import { Injectable, ConflictException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
@@ -7,14 +6,14 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { BaseService } from '../../common/services/base.service';
 import { UsersQueryDto } from './dto/users-query.dto';
+import { UserRepository } from './repositories/user.repository';
 
 @Injectable()
 export class UsersService extends BaseService<User> {
   constructor(
-    @InjectRepository(User)
-    private readonly usersRepository: Repository<User>,
+    private readonly userRepository: UserRepository,
   ) {
-    super(usersRepository);
+    super(userRepository);
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -24,12 +23,12 @@ export class UsersService extends BaseService<User> {
     }
 
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-    const user = this.usersRepository.create({
+    const user = this.userRepository.create({
       ...createUserDto,
       password: hashedPassword,
     });
 
-    return this.usersRepository.save(user);
+    return this.userRepository.save(user);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
@@ -48,17 +47,14 @@ export class UsersService extends BaseService<User> {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.usersRepository.findOne({ where: { email } });
+    return this.userRepository.findOne({ where: { email } });
   }
 
   async updateAccessToken(
     id: string,
     token: string | undefined,
   ): Promise<void> {
-    await this.usersRepository.query(
-      'UPDATE users SET access_token = ? WHERE id = ?',
-      [token ?? null, id],
-    );
+    await this.userRepository.updateAccessToken(id, token);
   }
 
   async findAllPaginated(query: UsersQueryDto): Promise<{
@@ -84,7 +80,7 @@ export class UsersService extends BaseService<User> {
       whereClause.role = role;
     }
 
-    const [users, total] = await this.usersRepository.findAndCount({
+    const [users, total] = await this.userRepository.findAndCount({
       where: whereClause,
       skip,
       take: limit,

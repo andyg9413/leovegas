@@ -46,7 +46,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Create a new user' })
   @ApiResponse({
     status: 201,
-    description: 'User created successfully',
+    description: 'The user has been successfully created',
     type: UserResponseDto,
   })
   @Roles(UserRole.ADMIN)
@@ -59,7 +59,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Get all users with pagination and filters' })
   @ApiResponse({
     status: 200,
-    description: 'Return paginated users',
+    description: 'The paginated list of users has been successfully retrieved',
     type: PaginatedUsersResponseDto,
   })
   @ApiExtraModels(UsersQueryDto)
@@ -78,7 +78,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Get a user by id' })
   @ApiResponse({
     status: 200,
-    description: 'Return the user',
+    description: 'The user has been successfully retrieved',
     type: UserResponseDto,
   })
   async findOne(
@@ -86,7 +86,7 @@ export class UsersController {
     @CurrentUser() currentUser: User,
   ): Promise<UserResponseDto> {
     if (currentUser.role !== UserRole.ADMIN && currentUser.id !== id) {
-      throw new ForbiddenException('You can only access your own user details');
+      throw new ForbiddenException('Only admins can access other user details');
     }
     const user = await this.usersService.findOne(id);
     return this.userMapper.toResponseDto(user);
@@ -96,7 +96,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Update a user' })
   @ApiResponse({
     status: 200,
-    description: 'User updated successfully',
+    description: 'The user has been successfully updated',
     type: UserResponseDto,
   })
   async update(
@@ -105,7 +105,7 @@ export class UsersController {
     @CurrentUser() currentUser: User,
   ): Promise<UserResponseDto> {
     if (currentUser.role !== UserRole.ADMIN && currentUser.id !== id) {
-      throw new ForbiddenException('You can only update your own user details');
+      throw new ForbiddenException('Only admins can update other user details');
     }
 
     if (currentUser.role !== UserRole.ADMIN && updateUserDto.role) {
@@ -131,14 +131,17 @@ export class UsersController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a user' })
-  @ApiResponse({ status: 200, description: 'User deleted successfully' })
+  @ApiResponse({ 
+    status: 200, 
+    description: 'The user has been successfully deleted' 
+  })
   @Roles(UserRole.ADMIN)
   async remove(
     @Param('id') id: string,
     @CurrentUser() currentUser: User,
   ): Promise<void> {
     if (currentUser.id === id) {
-      throw new ForbiddenException('You cannot delete your own account');
+      throw new ForbiddenException('Cannot delete your own account');
     }
 
     // Get the user being deleted
