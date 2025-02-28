@@ -1,0 +1,44 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build output
+dist
+build
+
+# Version control
+.git
+.gitignore
+
+# Environment
+.env
+.env.*
+*.env
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Testing
+test
+coverage
+.nyc_output
+
+# Documentation
+*.md
+!README.md
+docs
+
+# Development config
+.eslintrc*
+.prettierrc*
+.editorconfig
+nodemon.json
+
+# OS
+.DS_Store
+Thumbs.db 
