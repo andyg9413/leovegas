@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -65,9 +61,7 @@ export class UsersService extends BaseService<User> {
     );
   }
 
-  async findAllPaginated(
-    query: UsersQueryDto,
-  ): Promise<{
+  async findAllPaginated(query: UsersQueryDto): Promise<{
     data: User[];
     total: number;
     page: number;

@@ -16,7 +16,6 @@ import {
   ApiResponse,
   ApiBearerAuth,
   ApiExtraModels,
-  ApiQuery,
 } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';

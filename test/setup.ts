@@ -2,7 +2,7 @@ import { ConfigModule } from '@nestjs/config';
 import configuration from '../src/config/configuration';
 
 // Load environment configuration for tests
-ConfigModule.forRoot({
+void ConfigModule.forRoot({
   load: [configuration],
   isGlobal: true,
 });
