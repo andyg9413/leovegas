@@ -1,5 +1,5 @@
 import { Injectable, ConflictException } from '@nestjs/common';
-import { Repository, Like } from 'typeorm';
+import { Like } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -10,9 +10,7 @@ import { UserRepository } from './repositories/user.repository';
 
 @Injectable()
 export class UsersService extends BaseService<User> {
-  constructor(
-    private readonly userRepository: UserRepository,
-  ) {
+  constructor(private readonly userRepository: UserRepository) {
     super(userRepository);
   }
 

@@ -131,9 +131,9 @@ export class UsersController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a user' })
-  @ApiResponse({ 
-    status: 200, 
-    description: 'The user has been successfully deleted' 
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been successfully deleted',
   })
   @Roles(UserRole.ADMIN)
   async remove(

@@ -2,7 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../../../src/modules/users/users.service';
-import { User, UserRole } from '../../../src/modules/users/entities/user.entity';
+import {
+  User,
+  UserRole,
+} from '../../../src/modules/users/entities/user.entity';
 import { UserRepository } from '../../../src/modules/users/repositories/user.repository';
 import { Like } from 'typeorm';
 
@@ -94,7 +97,10 @@ describe('UsersService', () => {
     });
 
     it('should throw ConflictException if email already exists', async () => {
-      mockUserRepository.findOne.mockResolvedValue({ id: '1', ...createUserDto });
+      mockUserRepository.findOne.mockResolvedValue({
+        id: '1',
+        ...createUserDto,
+      });
 
       await expect(service.create(createUserDto)).rejects.toThrow(
         ConflictException,
@@ -347,7 +353,9 @@ describe('UsersService', () => {
       const result = await service.findByEmail(email);
 
       expect(result).toEqual(user);
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({ where: { email } });
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+        where: { email },
+      });
     });
 
     it('should return null when user is not found', async () => {

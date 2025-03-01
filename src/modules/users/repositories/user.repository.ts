@@ -12,10 +12,13 @@ export class UserRepository extends Repository<User> {
     super(repository.target, repository.manager, repository.queryRunner);
   }
 
-  async updateAccessToken(id: string, token: string | undefined): Promise<void> {
-    await this.query(
-      'UPDATE users SET access_token = ? WHERE id = ?',
-      [token ?? null, id],
-    );
+  async updateAccessToken(
+    id: string,
+    token: string | undefined,
+  ): Promise<void> {
+    await this.query('UPDATE users SET access_token = ? WHERE id = ?', [
+      token ?? null,
+      id,
+    ]);
   }
-} 
+}
